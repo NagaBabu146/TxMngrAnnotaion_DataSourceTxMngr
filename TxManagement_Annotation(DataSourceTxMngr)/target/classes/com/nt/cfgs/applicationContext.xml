@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+<!-- 		
+cfg  HicariDataSorce Class
+
+<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+    <property name="dataSourceClassName" value="com.mysql.cj.jdbc.Driver"/>
+    <property name="dataSource.url" value="jdbc:mysql://localhost:3306/springjdbc"/>
+    <property name="dataSource.user" value="root"/>
+    <property name="dataSource.password" value="root"/>
+</bean> -->
+
+<context:component-scan base-package="com.nt.service,com.nt.dao"/>
+
+<!--cfg dbcp2  -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName"
+			value="com.mysql.cj.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/springjdbc" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+
+      <!--cfg Jdbctemplate class  -->
+<bean id="template"  class="org.springframework.jdbc.core.JdbcTemplate">
+	<constructor-arg name="dataSource" ref="dataSource"/>
+</bean>
+
+    <!-- cfg DAO -->
+<!-- <bean id="accountDAO" class="com.nt.dao.AccountDAOImpl">
+      <constructor-arg name="jdbcTemplate" ref="template"/>
+</bean> -->
+
+    <!-- cfg Service -->
+<!-- <bean id="accountService" class="com.nt.service.AccountServiceImpl">
+      <constructor-arg name="dao" ref="accountDAO"/>
+</bean> -->
+
+    <!--cfg DataSourceTransactionManager  -->
+<bean id="txMngr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+  <property name="dataSource" ref="dataSource"/>
+</bean>
+
+    <!-- cfg PointCut cum Advisor to apply Tx Service -->
+
+<bean id="nmtas" class="org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource">
+   <property name="properties">
+        <props>
+            <prop key="transferMoney">PROPAGATION_REQUIRED</prop>
+        </props>
+   </property>
+</bean>
+
+    <!-- cfg TransactionProxyFactoryBean -->
+ <bean id="tpfb"
+	class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	<property name="transactionManager" ref="txMngr" />
+	<property name="transactionAttributeSource" ref="nmtas" />
+	<property name="target" ref="accserv" />
+ </bean>
+
+</beans>

@@ -1,0 +1,5 @@
+CREATE TABLE `springjdbc`.`tx_account` (
+  `accno` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `balance` VARCHAR(45) NULL,
+  PRIMARY KEY (`accno`));
